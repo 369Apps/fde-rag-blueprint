@@ -1,0 +1,7 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+# Production backends (optional — demo mode needs none of these):
+# openai>=1.30        # real answer generation
+# psycopg[binary]>=3.1  # Postgres + pgvector document store
+# neo4j>=5.20           # graph store
