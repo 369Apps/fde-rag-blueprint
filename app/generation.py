@@ -15,14 +15,21 @@ SYSTEM_PROMPT = (
     "contain the answer, say so explicitly instead of guessing."
 )
 
+ABSTAIN_TEXT = "I don't have any ingested documents that cover this."
+
+
+def _abstain(mode: str) -> dict:
+    return {
+        "answer": ABSTAIN_TEXT,
+        "citations": [],
+        "abstained": True,
+        "mode": mode,
+    }
+
 
 def _demo_answer(question: str, results: list[RetrievalResult]) -> dict:
     if not results:
-        return {
-            "answer": "I don't have any ingested documents that cover this.",
-            "citations": [],
-            "mode": "demo",
-        }
+        return _abstain("demo")
     parts = []
     for r in results:
         parts.append(f"[doc:{r.document.id}] {r.document.text.strip()}")
@@ -61,6 +68,11 @@ def _openai_answer(question: str, results: list[RetrievalResult]) -> dict:
 
 
 def generate(question: str, results: list[RetrievalResult]) -> dict:
+    # Nothing cleared the retrieval noise floor: abstain in every mode.
+    # Never send an empty context to the model and hope the prompt holds.
+    if not results:
+        mode = "openai" if os.environ.get("OPENAI_API_KEY") else "demo"
+        return _abstain(mode)
     if os.environ.get("OPENAI_API_KEY"):
         return _openai_answer(question, results)
     return _demo_answer(question, results)

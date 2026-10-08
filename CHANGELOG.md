@@ -33,3 +33,11 @@ EVALS PASSED
 `python -m unittest discover -s tests -v` ran 14 tests, all passing. On this run the 1-decimal p50 and p95 stayed 0.1; the report now includes the sample count and the small-sample note. The 0.1 vs 0.2 gap above is the same timings scored both ways, not a second harness invocation.
 
 Deterministic checks of the same formulas, not wall-clock timings: latencies 10, 20, 30, 40 ms scored p95 **30.0** before and **40.0** after. Two correct abstentions on a three-question set scored **2/1** and failed the old gate, and scored **2/2** and passed after.
+
+## Empty retrieval abstains before the model
+
+`generate` called `_openai_answer` whenever `OPENAI_API_KEY` was set, including when retrieval returned no documents. That sent the model an empty context. Confirmed by substituting a fake OpenAI client: `generate(question, [])` with a key set constructed the client.
+
+Demo mode already returned "I don't have any ingested documents that cover this." for an empty result list, but it did not set `abstained`, and that return sat behind the API-key branch.
+
+Empty results now return that same sentence with `abstained=True` and `citations=[]` before either generator runs. With a key set, `mode` is `openai`; otherwise `demo`. A non-empty result list still reaches the model.
