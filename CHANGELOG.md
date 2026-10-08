@@ -41,3 +41,10 @@ Deterministic checks of the same formulas, not wall-clock timings: latencies 10,
 Demo mode already returned "I don't have any ingested documents that cover this." for an empty result list, but it did not set `abstained`, and that return sat behind the API-key branch.
 
 Empty results now return that same sentence with `abstained=True` and `citations=[]` before either generator runs. With a key set, `mode` is `openai`; otherwise `demo`. A non-empty result list still reaches the model.
+
+After this guard, `python -m unittest discover -s tests -v` ran 17 tests, all passing, and `python -m app.evals` printed:
+
+```
+{'faithfulness': '3/3', 'abstention_correct': '1/1', 'latency_ms': {'p50': 0.1, 'p95': 0.1, 'samples': 4, 'note': 'p95 is the max below 20 samples'}}
+EVALS PASSED
+```
