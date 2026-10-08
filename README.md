@@ -51,7 +51,9 @@ app/
 python -m app.evals
 ```
 
-Runs the golden question set against the pipeline and reports faithfulness (every claim cited), citation coverage, and p95 latency. Gate deployments on this — a RAG system without evals is a demo.
+Runs the golden question set against the pipeline and reports faithfulness (required docs cited in the answer text as `[doc:<id>]`), abstention on unanswerable questions, and nearest-rank p95 latency. Gate deployments on this — a RAG system without evals is a demo.
+
+Scoring used to count retrieved ids as citations, hardcode the abstention denominator at 1, and index p95 off by one. Measured before/after numbers are in CHANGELOG.md.
 
 ## Why this shape
 
